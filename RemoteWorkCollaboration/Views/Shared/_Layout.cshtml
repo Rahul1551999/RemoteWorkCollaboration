@@ -31,9 +31,11 @@
                             @if (User.Identity.IsAuthenticated)
                             {
                                 <li class="nav-item">
-                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm" class="form-inline">
-                                        <button type="submit" class="nav-link btn btn-link">Logout</button>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
+                                        <button type="submit" class="btn btn-link">Logout</button>
+                                        @Html.AntiForgeryToken() <!-- Anti-forgery token for security -->
                                     </form>
+
                                 </li>
                             }
                             else
