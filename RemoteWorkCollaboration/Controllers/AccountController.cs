@@ -17,13 +17,16 @@ namespace RemoteWorkCollaboration.Controllers
         }
 
         // GET: /Account/Login
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Login()
         {
-            return View();
+            return View("Login"); // Load the login view explicitly
         }
+
 
         // POST: /Account/Login
         [HttpPost]
+
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -77,7 +80,8 @@ namespace RemoteWorkCollaboration.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home"); // Redirect to a suitable page after logout
+            return RedirectToAction("Login", "Account"); // Redirect to login page after logout
         }
+
     }
 }
