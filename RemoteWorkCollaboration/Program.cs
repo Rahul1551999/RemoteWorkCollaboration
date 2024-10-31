@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RemoteWorkCollaboration.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 
 namespace RemoteWorkCollaboration
 {
@@ -8,17 +9,50 @@ namespace RemoteWorkCollaboration
     {
         public static void Main(string[] args)
         {
+            // Test SQL Server connection on startup
+            using (var connection = new SqlConnection("Server=RAHUL\\REMOTEWORKCOLLAB;Database=RemoteWorkCollaborationDB;Trusted_Connection=True;MultipleActiveResultSets=true"))
+            {
+                try
+                {
+                    connection.Open();
+                    Console.WriteLine("Database connection successful!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Database connection failed: {ex.Message}");
+                }
+            }
+
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            // Configure logging to include EF Core details
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole(); // Add console logging
+            builder.Logging.AddDebug(); // Add debug logging
 
-            // Setting up Identity for user authentication and registration
+            // Add services to the container
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                       .EnableSensitiveDataLogging() // Optional: enables logging of sensitive data (e.g., parameters)
+                       .LogTo(Console.WriteLine, LogLevel.Information)); // Logs SQL commands to the console
+
+            // Setup Identity services
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddControllersWithViews();
+
+            // Configure CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    policyBuilder =>
+                    {
+                        policyBuilder.AllowAnyOrigin()
+                                     .AllowAnyMethod()
+                                     .AllowAnyHeader();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -33,19 +67,21 @@ namespace RemoteWorkCollaboration
 
             app.UseRouting();
 
-            // Add UseAuthentication before UseAuthorization
+            // Ensure CORS is set before Authentication & Authorization
+            app.UseCors("AllowAll");
+
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.MapControllerRoute(
-            //    name: "default",
-            //    pattern: "{controller=Home}/{action=Index}/{id?}");
+            // Map routes for controllers
             app.MapControllerRoute(
-   name: "default",
-   pattern: "{controller=Account}/{action=Login}/{id?}");
+                name: "default",
+                pattern: "{controller=Account}/{action=Login}/{id?}");
 
-
+            // Run the application
             app.Run();
+            builder.Logging.AddConsole(); 
+
         }
     }
 }

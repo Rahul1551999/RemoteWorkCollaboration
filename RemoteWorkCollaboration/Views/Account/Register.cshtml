@@ -1,8 +1,20 @@
-﻿@model RemoteWorkCollaboration.Models.RegisterViewModel
+﻿@model RemoteWorkCollaboration.Models.RegisteredUser
 
 <h2>Register</h2>
 
+@if (ViewData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @ViewData["SuccessMessage"]
+    </div>
+}
+
 <form asp-action="Register" method="post">
+    <div class="form-group">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
     <div class="form-group">
         <label asp-for="Email"></label>
         <input asp-for="Email" class="form-control" />
@@ -13,14 +25,24 @@
         <input asp-for="Password" class="form-control" type="password" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    @* <div class="form-group">
         <label asp-for="ConfirmPassword"></label>
         <input asp-for="ConfirmPassword" class="form-control" type="password" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
+    </div> *@
+
     <button type="submit" class="btn btn-primary">Register</button>
     <p>
         Already have an account? <a asp-action="Login">Login here</a>
     </p>
-
 </form>
+
+@if (Model != null)
+{
+    <h3>Entered Data:</h3>
+    <ul>
+        <li><strong>User Name:</strong> @Model.UserName</li>
+        <li><strong>Email:</strong> @Model.Email</li>
+        <li><strong>Password:</strong> @Model.Password</li>
+    </ul>
+}

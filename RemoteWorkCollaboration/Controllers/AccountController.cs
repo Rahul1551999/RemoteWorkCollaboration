@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using RemoteWorkCollaboration.Models;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using RemoteWorkCollaboration.Data;
+using System.Threading.Tasks;
 
 namespace RemoteWorkCollaboration.Controllers
 {
@@ -9,18 +13,27 @@ namespace RemoteWorkCollaboration.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ApplicationDbContext _context; // Your DbContext for EF Core
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            ApplicationDbContext context,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
+            _logger = logger;
         }
 
         // GET: /Account/Login
         [HttpGet]
         public IActionResult Login()
         {
-            return View("Login"); // Load the login view explicitly
+           
+            return View(); // Load the login view explicitly
         }
 
 
@@ -50,29 +63,53 @@ namespace RemoteWorkCollaboration.Controllers
             return View();
         }
 
-        // POST: /Account/Register
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisteredUser model)
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
+                var newUser = new RegisteredUser
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Dashboard"); // Redirect to dashboard after successful registration
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    Password = model.Password,
+                    CreatedDate = DateTime.Now
+                };
+
+                try
+                {
+                    _context.UserTb.Add(newUser);  // Explicitly adding to UserTB
+                    _logger.LogInformation("Attempting to save new user to UserTB table.");
+
+                    int result = await _context.SaveChangesAsync();  // Returns the number of affected rows
+
+                    if (result > 0)
+                    {
+                        _logger.LogInformation($"User '{newUser.UserName}' registered and saved to the database successfully.");
+                        TempData["SuccessMessage"] = "User registered successfully!";
+                        return RedirectToAction("Login");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No rows were affected by SaveChangesAsync. Data may not have been saved.");
+                        ModelState.AddModelError(string.Empty, "User registration failed. Please try again.");
+                    }
                 }
-
-                foreach (var error in result.Errors)
+                catch (Exception ex)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    _logger.LogError($"Error saving user to database: {ex.Message}");
+                    ModelState.AddModelError(string.Empty, "Failed to save user data. Please try again.");
                 }
             }
 
             return View(model);
         }
+
+
+
+
+
 
         // POST: /Account/Logout
         [HttpPost]

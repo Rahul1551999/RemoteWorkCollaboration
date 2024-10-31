@@ -1,32 +1,31 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RemoteWorkCollaboration.Models
 {
-    public class RegisteredUser : Controller
-    {
+    [Table("UserTb")]
 
-        public int Id {  get; set; }
-       
+    public class RegisteredUser
+    {
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid(); // Automatically generate a new GUID
+
         [Required]
-        [StringLength(100)]
         public string UserName { get; set; }
 
-        
         [Required]
         [EmailAddress]
         public string Email { get; set; }
 
         [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } // Store hashed password if using security best practices
+        [MaxLength(100)]
+        public string Password { get; set; }
 
-
-        public IActionResult Index()
-        {
-            return View();
-        }
+        [NotMapped] // Exclude from database
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
+
 }
