@@ -77,6 +77,7 @@ namespace RemoteWorkCollaboration
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
+            app.MapControllers();
 
             // Run the application
             app.Run();

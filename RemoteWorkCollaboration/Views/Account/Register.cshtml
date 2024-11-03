@@ -8,28 +8,27 @@
         @ViewData["SuccessMessage"]
     </div>
 }
-
-<form asp-action="Register" method="post">
+<form id="registrationForm" onsubmit="return handleRegistration(event)">
     <div class="form-group">
         <label asp-for="UserName"></label>
-        <input asp-for="UserName" class="form-control" />
+        <input asp-for="UserName" class="form-control" required />
         <span asp-validation-for="UserName" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
+        <input asp-for="Email" class="form-control" type="email" required />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" type="password" />
+        <input asp-for="Password" class="form-control" type="password" required />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-    @* <div class="form-group">
+    <div class="form-group">
         <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" class="form-control" type="password" />
+        <input asp-for="ConfirmPassword" class="form-control" type="password" required />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div> *@
+    </div>
 
     <button type="submit" class="btn btn-primary">Register</button>
     <p>
@@ -37,12 +36,40 @@
     </p>
 </form>
 
-@if (Model != null)
-{
-    <h3>Entered Data:</h3>
-    <ul>
-        <li><strong>User Name:</strong> @Model.UserName</li>
-        <li><strong>Email:</strong> @Model.Email</li>
-        <li><strong>Password:</strong> @Model.Password</li>
-    </ul>
-}
+<script>
+    async function handleRegistration(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const form = document.getElementById('registrationForm');
+        const formData = new FormData(form);
+
+        const userData = {
+            UserName: formData.get('UserName'),
+            Email: formData.get('Email'),
+            Password: formData.get('Password'),
+            ConfirmPassword: formData.get('ConfirmPassword'),
+        };
+
+        try {
+            const response = await fetch('/api/userregistration/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.message); // Show success message
+                window.location.href = result.redirectUrl; // Redirect to the login page
+            } else {
+                const errorResponse = await response.json();
+                alert(errorResponse.message || 'An error occurred during registration.');
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
+    }
+</script>

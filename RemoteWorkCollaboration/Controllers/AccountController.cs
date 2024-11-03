@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using RemoteWorkCollaboration.Data;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace RemoteWorkCollaboration.Controllers
 {
@@ -63,50 +64,47 @@ namespace RemoteWorkCollaboration.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisteredUser model)
-        {
-            if (ModelState.IsValid)
-            {
-                var newUser = new RegisteredUser
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    Password = model.Password,
-                    CreatedDate = DateTime.Now
-                };
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Register([FromBody] RegisteredUser model)
+        //{
+        //    // Log received model
+        //    _logger.LogInformation($"Received model: {JsonSerializer.Serialize(model)}");
 
-                try
-                {
-                    _context.UserTb.Add(newUser);  // Explicitly adding to UserTB
-                    _logger.LogInformation("Attempting to save new user to UserTB table.");
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-                    int result = await _context.SaveChangesAsync();  // Returns the number of affected rows
+        //    // Check if passwords match
+        //    if (model.Password != model.ConfirmPassword)
+        //    {
+        //        _logger.LogWarning("Passwords do not match.");
+        //        ModelState.AddModelError("ConfirmPassword", "Passwords do not match.");
+        //        return BadRequest(ModelState);
+        //    }
 
-                    if (result > 0)
-                    {
-                        _logger.LogInformation($"User '{newUser.UserName}' registered and saved to the database successfully.");
-                        TempData["SuccessMessage"] = "User registered successfully!";
-                        return RedirectToAction("Login");
-                    }
-                    else
-                    {
-                        _logger.LogWarning("No rows were affected by SaveChangesAsync. Data may not have been saved.");
-                        ModelState.AddModelError(string.Empty, "User registration failed. Please try again.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error saving user to database: {ex.Message}");
-                    ModelState.AddModelError(string.Empty, "Failed to save user data. Please try again.");
-                }
-            }
+        //    var newUser = new RegisteredUser
+        //    {
+        //        UserName = model.UserName,
+        //        Email = model.Email,
+        //        Password = model.Password,
+        //        CreatedDate = DateTime.Now
+        //    };
 
-            return View(model);
-        }
-
-
+        //    try
+        //    {
+        //        _context.UserTb.Add(newUser);
+        //        await _context.SaveChangesAsync();
+        //        _logger.LogInformation($"User '{newUser.UserName}' registered successfully.");
+        //        return Ok(new { message = "User registered successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError($"Error saving user to database: {ex.Message}");
+        //        return StatusCode(500, "An error occurred while registering the user.");
+        //    }
+        //}
 
 
 
