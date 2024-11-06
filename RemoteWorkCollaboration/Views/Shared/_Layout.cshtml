@@ -6,45 +6,88 @@
     <title>@ViewData["Title"] - Remote Work Collaboration</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <!-- CSS and JS for Toastr -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <!-- jQuery (required for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <link href="https://kit.fontawesome.com/a076d05399.css" rel="stylesheet" />
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
+  
     @* Show the navbar unless the user is on the Login page *@
     @if (!(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" &&
     ViewContext.RouteData.Values["action"]?.ToString() == "Login"))
     {
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Remote Work Collaboration</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <!-- Sidebar Toggle Button -->
+                <button type="button" id="sidebarCollapse" class="btn btn-light">
+                    <div class="hamburger" id="hamburger">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-                        </li>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
-                                    <button type="submit" class="btn btn-link nav-link">Logout</button>
-                                    @Html.AntiForgeryToken() <!-- Security token -->
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                            </li>
-                             <li class="nav-item">
-                                 <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                             </li>
-                        }
+
+                <!-- Navbar Brand -->
+                <a class="navbar-brand" asp-area="" asp-page="/Index">RemoteWorkCollaboration</a>
+
+
+                <!-- Account Dropdown Button -->
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link " id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- Account Icon (you can use a font-awesome icon or other libraries) -->
+                            <img src="~/img/user.png" class="account-icon" alt="User Account" />
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Profile</a>
+                            <a class="dropdown-item" href="#">Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="" onclick="logout()">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+       
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="/" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="#taskSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="fas fa-tasks"></i> Tasks</a>
+                    <ul class="collapse list-unstyled" id="taskSubmenu">
+                        <li><a href="/tasks" class="nav-link">All Tasks</a></li>
+                        <li><a href="/tasks/create" class="nav-link">Create Task</a></li>
+                        <li><a href="/tasks/completed" class="nav-link">Completed Tasks</a></li>
                     </ul>
-                </div>
-            </div>
+                </li>
+                <li>
+                    <a href="#meetingSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="fas fa-calendar-check"></i> Meetings</a>
+                    <ul class="collapse list-unstyled" id="meetingSubmenu">
+                        <li><a href="/meetings" class="nav-link">All Meetings</a></li>
+                        <li><a href="/meetings/schedule" class="nav-link">Schedule Meeting</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/calendar" class="nav-link"><i class="fas fa-calendar-alt"></i> Calendar</a>
+                </li>
+                <li>
+                    <a href="/chat" class="nav-link"><i class="fas fa-comments"></i> Chat</a>
+                </li>
+            </ul>
         </nav>
     }
 
@@ -64,6 +107,23 @@
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.17.0/jquery.validate.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active'); // Toggle sidebar visibility
+                $('#content').toggleClass('active'); // Shift main content
+                $('#hamburger').toggleClass('active'); // Toggle hamburger animation
+            });
+        });
+    </script>
+    <script>
+        // Function to show toastr notifications
+        function showToast(type, message) {
+            toastr[type](message);
+        }
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

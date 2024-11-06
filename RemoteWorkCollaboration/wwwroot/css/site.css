@@ -1,22 +1,206 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0; /* Remove bottom margin */
+}
+
+.navbar {
+    position: relative; /* Allow z-index to take effect */
+    z-index: 1001; /* Higher than sidebar */
+}
+
+/* Sidebar Styling */
+#sidebar {
+    background: #343a40;
+    color: white;
+    position: fixed;
+    height: 100vh;
+    width: 250px;
+    transition: all 0.3s;
+    z-index: 900;
+    overflow-y: auto;
+    padding-top: 70px; /* Adjust as needed to start below navbar */
+    left: -250px; /* Initially hidden */
+    top: 0; /* Align to top */
+}
+
+    #sidebar.active {
+        left: 0; /* Show sidebar */
+    }
+
+.navbar-brand {
+    margin-left: 50px; /* Add space between the button and the brand */
+}
+
+.nav-link {
+    color: white;
+    padding: 10px 15px;
+    display: block;
+    transition: background 0.3s;
+}
+
+    .nav-link:hover {
+        background: #007bff;
+    }
+
+/* Main Content Area */
+#content {
+    margin-left: 0;
+    transition: margin-left 0.3s;
+}
+
+    #content.active {
+        margin-left: 250px; /* Shift content when sidebar is visible */
+    }
+
+/* Toggle Button */
+#sidebarCollapse {
+    position: absolute;
+    top: 10px; /* Adjust to fit your navbar */
+    left: 10px; /* Adjust to fit your navbar */
+    z-index: 1000;
+}
+
+/* Footer Styling */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: white;
+}
+/* Hamburger Button Styles */
+.hamburger-button {
+    position: absolute; /* Absolute positioning inside the navbar */
+    top: 15px; /* Adjust vertical position as needed */
+    left: 15px; /* Position it closer to the left */
+    z-index: 1000; /* Above other content */
+    background-color: transparent; /* Make background transparent */
+    border: none; /* Remove border */
+    padding: 5px; /* Padding around the button */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+    /* Hover Effect */
+    .hamburger-button:hover {
+        background-color: rgba(0, 0, 0, 0.1); /* Light background on hover */
+        border-radius: 4px; /* Rounded corners on hover */
+    }
+/* Hamburger Button Styles */
+.hamburger-button {
+    position: absolute; /* Absolute positioning inside the navbar */
+    top: 15px; /* Adjust vertical position as needed */
+    left: 15px; /* Position it closer to the left */
+    z-index: 1000; /* Above other content */
+    background-color: transparent; /* Make background transparent */
+    border: none; /* Remove border */
+    padding: 5px; /* Padding around the button */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+    /* Hover Effect */
+    .hamburger-button:hover {
+        background-color: rgba(0, 0, 0, 0.1); /* Light background on hover */
+        border-radius: 4px; /* Rounded corners on hover */
+    }
+
+/* Hamburger Styles */
+.hamburger {
+    display: inline-block;
+    cursor: pointer;
+    width: 30px; /* Width of the hamburger */
+    height: 22px; /* Height of the hamburger */
+    position: relative;
+}
+
+.line {
+    display: block;
+    height: 4px; /* Thickness of the lines */
+    width: 100%; /* Full width of the hamburger */
+    background-color: #333; /* Color of the lines */
+    margin: 4px 0; /* Space between lines */
+    transition: all 0.3s ease; /* Transition for animations */
+    border-radius: 10px;
+}
+/* Hamburger Active State */
+#hamburger.active .line:nth-child(1) {
+    transform: translateX(-2px); /* Move left and rotate top line */
+    /*background-color: #007bff;*/ /* Change color on active */
+}
+
+#hamburger.active .line:nth-child(2) {
+    transform: translateX(2px); /* Move middle line slightly to the right */
+    /*opacity: 0;*/ /* Hide middle line */
+}
+
+#hamburger.active .line:nth-child(3) {
+    transform: translateX(-2px); /* Move left and rotate bottom line */
+    /*background-color: #007bff;*/ /* Change color on active */
+}
+
+
+/* Optional styles for line hover effect */
+/*.line:hover {
+    background-color: #007bff;*/ /* Change color on hover */
+/*}*/
+
+/* Optional styles for button */
+#sidebarCollapse {
+    background: none; /* Remove default button styling */
+    border: none; /* Remove border */
+    outline: none; /* Remove outline */
+    padding: 0; /* Remove padding */
+}
+/* Style for the account image (circular shape) */
+.account-icon {
+    width: 20px; /* Adjust size of the image */
+    height: 20px;
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover; /* Ensure the image fits within the circle */
+}
+
+    /* Remove hover effect (no glowing) from the account icon */
+    .account-icon:hover {
+        box-shadow: none; /* No glow effect on hover */
+        opacity: 1; /* Remove opacity change on hover */
+    }
+
+/* Navbar right alignment */
+.navbar-nav.ml-auto {
+    margin-left: auto;
+}
+
+/* Ensure the dropdown doesn't glow */
+.nav-item.dropdown .nav-link:hover {
+    box-shadow: none; /* Prevent glowing effect on the dropdown link */
+    background-color: transparent; /* Remove any background highlight on hover */
+}
+
+/* Adjust dropdown to ensure it's right-aligned */
+.dropdown-menu-right {
+    right: 0;
 }
